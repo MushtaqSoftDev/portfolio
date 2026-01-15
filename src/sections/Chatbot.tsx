@@ -24,10 +24,10 @@ const STACK_RESPONSES: Record<string, string> = {
     "🎨 Front-end Development\n\n• React, Three.js\n• Tailwind, VueJS\n• Responsive UI\n• Performance optimization\n\n📩 mushtaquok70@gmail.com",
 
   "Back-end development":
-    "⚙️ Back-end Development\n\n• Node.js, Express\n• Python & Flask\n• PHP-Laravel\n• Java-SpringBoot\n• Scalable APIs\n\n📩 mushtaquok70@gmail.com",
+    "⚙️ Back-end Development\n\n• Node.js, Express, LangChain\n• Python & Flask\n• PHP-Laravel\n• Java-SpringBoot\n• Scalable APIs\n\n📩 mushtaquok70@gmail.com",
 
   "AI/ML development":
-    "🤖 AI / ML Development\n\n• OpenAI APIs\n• Hugging Face\n• RAG ChatBot\n• PyTorch DL Models\n• Vector DB concepts\n\n📩 mushtaquok70@gmail.com",
+    "🤖 AI / ML Development\n\n• OpenAI APIs\n• LangChain\n• RAG ChatBot\n• PyTorch DL Models\n• Vector DB concepts\n\n📩 mushtaquok70@gmail.com",
 };
 
 const RESPONSE_DELAY = 10000;
