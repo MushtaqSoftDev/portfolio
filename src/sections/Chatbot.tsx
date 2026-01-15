@@ -1,17 +1,10 @@
 import { useEffect, useState, useRef } from "react";
 import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 
 const setToast = (message: string) => {
-  toast.info(message, {
-    position: "bottom-center",
-    autoClose: 2000,
-    hideProgressBar: true,
-    closeOnClick: true,
-    pauseOnHover: false,
-    draggable: false,
-    progress: undefined,
-    theme: "dark",
-  });
+  toast.success(message, { autoClose: 3000 });
 }
 
 type Message = {
@@ -105,6 +98,7 @@ const Chatbot = () => {
 
   const handleEmailClick = () => {
     navigator.clipboard.writeText("mushtaquok70@gmail.com");
+    toast.dismiss();
     setToast("Email copied");
   };
 
