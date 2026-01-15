@@ -53,7 +53,7 @@ const Chatbot = () => {
       setMessages([
         {
           id: 1,
-          text: "Hi 👋 Welcome to my portfolio. \nWhat would you like to explore today?\n👇",
+          text: "Hi 👋 Welcome to my portfolio. \nAI chat coming soon -- currently in beta\nWhat would you like to explore today?\n👇",
           side: "left",
           buttons: Object.keys(STACK_RESPONSES),
           time: getTime(),
