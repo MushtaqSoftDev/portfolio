@@ -114,60 +114,74 @@ const Contact = () => {
       {alert.show && <Alert {...alert} />}
 
       <div className="relative min-h-screen flex items-center justify-center flex-col">
-        <img src="/assets/terminal.png" alt="terminal-bg" className="absolute inset-0 min-h-screen" />
 
-        <div className="contact-container pt-6 relative z-10">
-          <h3 className="head-text">Let's talk</h3>
-          <p className="text-lg text-white-600 mt-3">
-            Let's turn your vision into user-friendly, hight-performance reality that drives results.
-          </p>
+        {/** Terminal Container */}
+        <div className="terminal-shell relative z-10 w-full max-w-2xl mx-auto">
+          {/** Terminal Header */}
+          <div className="terminal-header">
+            <div className="terminal-dots">
+              <span className='dot red' />
+              <span className='dot yellow' />
+              <span className='dot green' />
+            </div>
+            <div className="terminal-plus">+</div>
+          </div>
 
-          <form ref={formRef} onSubmit={handleSubmit} className="mt-12 flex flex-col space-y-7">
-            <label className="space-y-3">
-              <span className="field-label">Full Name</span>
-              <input
-                type="text"
-                name="name"
-                value={form.name}
-                onChange={handleChange}
-                required
-                className="field-input"
-                placeholder="John Doe"
-              />
-            </label>
+          {/** Terminal Body */}
+        
+          <div className="terminal-body">
+            <h3 className="head-text">Let's talk</h3>
+            <p className="text-lg text-white-600 mt-3">
+              Let's turn your vision into user-friendly, hight-performance reality that drives results.
+            </p>
 
-            <label className="space-y-3">
-              <span className="field-label">Email address</span>
-              <input
-                type="email"
-                name="email"
-                value={form.email}
-                onChange={handleChange}
-                required
-                className="field-input"
-                placeholder="johndoe@gmail.com"
-              />
-            </label>
+            <form ref={formRef} onSubmit={handleSubmit} className="mt-12 flex flex-col space-y-7">
+              <label className="space-y-3">
+                <span className="field-label">Full Name</span>
+                <input
+                  type="text"
+                  name="name"
+                  value={form.name}
+                  onChange={handleChange}
+                  required
+                  className="field-input"
+                  placeholder="John Doe"
+                />
+              </label>
 
-            <label className="space-y-3">
-              <span className="field-label">Your message</span>
-              <textarea
-                name="message"
-                value={form.message}
-                onChange={handleChange}
-                required
-                rows={3}
-                className="field-input"
-                placeholder="Let's turn your vision into user-friendly, high-performance reality that drives results."
-              />
-            </label>
+              <label className="space-y-3">
+                <span className="field-label">Email address</span>
+                <input
+                  type="email"
+                  name="email"
+                  value={form.email}
+                  onChange={handleChange}
+                  required
+                  className="field-input"
+                  placeholder="johndoe@gmail.com"
+                />
+              </label>
 
-            <button className="field-btn" type="submit" disabled={loading}>
-              {loading ? 'Sending...' : 'Send Message'}
+              <label className="space-y-3">
+                <span className="field-label">Your message</span>
+                <textarea
+                  name="message"
+                  value={form.message}
+                  onChange={handleChange}
+                  required
+                  rows={4}
+                  className="field-input"
+                  placeholder="Let's turn your vision into user-friendly, high-performance reality that drives results."
+                />
+              </label>
 
-              <img src="/assets/arrow-up.png" alt="arrow-up" className="field-btn_arrow" />
-            </button>
-          </form>
+              <button className="field-btn" type="submit" disabled={loading}>
+                {loading ? 'Sending...' : 'Send Message'}
+
+                <img src="/assets/arrow-up.png" alt="arrow-up" className="field-btn_arrow" />
+              </button>
+            </form>
+          </div>
         </div>
       </div>
     </section>
