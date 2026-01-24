@@ -99,7 +99,7 @@ export const myProjects = [
   },
   {
     title: 'FinchMotion - Java Robotics Control System',
-    desc: 'FinchMotion is an interactive robotics project built with Core Java and JDBC API, developed collaboratively during studies. It enables the Finch Robot to move, turn & respond dynamically to programmed movement commands.',
+    desc: 'FinchMotion is an interactive robotics project built with Core Java and JDBC API, developed collaboratively with colleagues. It enables the Finch Robot to move, turn & respond dynamically to programmed movement commands.',
     subdesc:
       'Using Java-based logic and database-driven instructions, FinchMotion demonstrates the power of algorithmic motion control. The projects highlights teamwork, hardware integration and real-time execution for intelligent robotic movement.',
     href: 'https://github.com/MushtaqSoftDev/JavaFinchRobot',
@@ -126,7 +126,7 @@ export const myProjects = [
   },
   {
     title: 'Betflix - Laravel Streaming Platform',
-    desc: 'Betflix is an innovative streaming web app inspired by Netflix, develped as a study project with my colleague. It allows to sign up, log in and manage personalized watchlists with favorites and subscriptions.',
+    desc: 'Betflix is an innovative streaming web app inspired by Netflix, develped project with my colleague. It allows to sign up, log in and manage personalized watchlists with favorites and subscriptions.',
     subdesc:
       'Built using Laravel, Eloquent ORM, Blade with Bootstrap, Betflix offers a full-featured platform for streaming and content management. Admins can perform complete CRUD operations on movies & series, ensuring smooth performance and scalability.',
     href: 'https://github.com/MushtaqSoftDev',
@@ -218,6 +218,15 @@ export const workExperiences = [
   },
   {
     id: 2,
+    name: 'Freelance',
+    pos: 'Web Developer',
+    duration: '2023 - 2024',
+    title: "As a Freelance Web Developer, built a dynamic ROI calculator web app using MERN Stack that instantly generates year-wise profit & agency commission breakdowns, enable clients to visualize investment returns in real-time. Developed a real-time AI chatbot app using Node/Express/MongoDB with Socket.io integration and OpenAI API, Developed Flask app that read the pdf and extract the skills and generate a graphical representation of candidates using Matplotlib.",
+    icon: '/assets/freelance.jpeg',
+    animation: 'salute',
+  },
+  {
+    id: 3,
     name: 'Mega Star',
     pos: 'IT Technician',
     duration: '2019 - 2024',
@@ -226,7 +235,7 @@ export const workExperiences = [
     animation: 'clapping',
   },
   {
-    id: 3,
+    id: 4,
     name: 'Global Coaching Center',
     pos: 'Mathematics Tutor',
     duration: '2014 - 2018',
