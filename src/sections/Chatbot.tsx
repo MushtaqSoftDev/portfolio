@@ -39,7 +39,10 @@ const getTime = () =>
 const Chatbot = () => {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
+  const [inputValue, setInputValue] = useState("");
+  const [isAiLoading, setIsAiLoading] = useState(false);
   const bottomRef = useRef<HTMLDivElement | null>(null);
+
 
   // Auto-scroll
   useEffect(() => {
@@ -53,7 +56,7 @@ const Chatbot = () => {
       setMessages([
         {
           id: 1,
-          text: "Hi 👋 Welcome to my portfolio. \nAI chat coming soon -- currently in beta\nWhat would you like to explore today?\n👇",
+          text: "Hi 👋 Welcome to my portfolio. \nWhat would you like to explore today?\n👇",
           side: "left",
           buttons: Object.keys(STACK_RESPONSES),
           time: getTime(),
@@ -63,6 +66,59 @@ const Chatbot = () => {
 
     return () => clearTimeout(timer);
   }, []);
+
+  // Handle RAG Integration
+  const handleSendMessage = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (!inputValue.trim() || isAiLoading) return;
+
+    const userText = inputValue;
+    const typingId = Date.now() + 1;
+
+    // 1. Add user message and typing indicator
+    setMessages((prev) => [
+      ...prev,
+      { id: Date.now(), text: userText, side: "right", time: getTime() },
+      { id: typingId, side: "left", typing: true, time: getTime() },
+    ]);
+
+    setInputValue("");
+    setIsAiLoading(true);
+
+    try {
+      // 2. Call backend Cloudflare Pages
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question: userText }),
+      });
+
+      if (!response.ok) throw new Error("Error from server");
+
+      const data = await response.json();
+
+      // 3. Remove typing indicator and add AI response
+      setMessages((prev) => 
+        prev.filter((msg) => msg.id !== typingId)
+        .concat({
+          id: Date.now(),
+          text: data.answer || "Hmm, I don't have an answer for that yet.",
+          side: "left",
+          time: getTime(),
+        }));
+    } catch (error) {
+      setMessages((prev) => 
+        prev.filter((msg) => msg.id !== typingId).concat({
+          id: Date.now(),
+          text: "Sorry, something went wrong. Please try again later.",
+          side: "left",
+          time: getTime(),
+        }));
+        console.error("Chatbot error:", error);
+    } finally {
+      setIsAiLoading(false);
+    }
+  };
 
   const handleOptionClick = (option: string) => {
     const typingId = Date.now() + 1;
@@ -93,7 +149,7 @@ const Chatbot = () => {
           text: STACK_RESPONSES[option],
           side: "left",
         }));
-    }, RESPONSE_DELAY);
+    }, 8000);
   };
 
   const handleEmailClick = () => {
@@ -155,14 +211,14 @@ const Chatbot = () => {
                                 className="mt-2 flex items-center gap-2 cursor-pointer
                                 text-blue-400 hover:text-blue-300 transition"
                             >
-                        📩 <span className="underline">{line.replace("📩", "").trim()}</span>
-        </div>
-      );
-    }
+                              📩 <span className="underline">{line.replace("📩", "").trim()}</span>
+                            </div>
+                          );
+                        }
 
-    return <div key={i}>{line}</div>;
-  })}
-</div>
+                          return <div key={i}>{line}</div>;
+                        })}
+                      </div>
 
 
                       {msg.buttons && (
@@ -191,6 +247,35 @@ const Chatbot = () => {
             ))}
             <div ref={bottomRef}/>
           </div>
+
+          {/* Input Form */}
+          <form 
+            onSubmit={handleSendMessage}
+            className="p-3 bg-[#1a1a1a] border-t border-white/10 flex items-center gap-2"
+          >
+            <input
+              type="text"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              placeholder="Type your message..."
+              className="flex-1 bg-black/50 text-white text-sm rounded-xl px-4 py-2 border border-white/5 focus:outline-none focus:border-blue-500 transition"
+              disabled={isAiLoading}
+            />
+            <button
+              type="submit"
+              disabled={isAiLoading || !inputValue.trim()}
+              className={`p-2 rounded-xl transition ${
+                !inputValue.trim() || isAiLoading 
+                ? "text-gray-600 bg-transparent" 
+                : "text-white bg-blue-600 hover:bg-blue-500"
+              }`}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="22" y1="2" x2="11" y2="13"></line>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+              </svg>
+            </button>
+          </form>
         </div>
       )}
 
