@@ -1,7 +1,7 @@
 import { GoogleGenerativeAIEmbeddings, ChatGoogleGenerativeAI } from "@langchain/google-genai";
 import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
 // Fix: New export path for MemoryVectorStore
-import { MemoryVectorStore } from "@langchain/core/vectorstores"; 
+import { MemoryVectorStore } from "langchain/vectorstores/memory"; 
 // Fix: New export path for RetrievalQAChain
 import { RetrievalQAChain } from "langchain/chains"; 
 
