@@ -87,11 +87,30 @@ const Chatbot = () => {
 
     try {
       // 2. Call backend Cloudflare Pages
-      const response = await fetch("/api/chat", {
+      /*const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ question: userText }),
+      });*/
+      const wakeUpMessageId = Date.now() + 2;
+      const wakeUpTimer = setTimeout(() => {
+        setMessages(prev => [...prev, {
+        id: wakeUpMessageId,
+        text: "☕ The server is waking up (this takes ~1 min on the free tier). Please wait...",
+        side: "left",
+        time: getTime()
+      }]);
+    }, 5000); // Show after 5 seconds of waiting
+      // Replace your old Cloudflare URL with your Render URL
+      const response = await fetch("https://rag-portfolio-bot.onrender.com/chat", {
+       method: "POST",
+       headers: { "Content-Type": "application/json" },
+       body: JSON.stringify({ question: userText }),
       });
+
+      // After fetch is done
+      clearTimeout(wakeUpTimer);
+      setMessages(prev => prev.filter(m => m.id !== wakeUpMessageId));
 
       if (!response.ok) throw new Error("Error from server");
 
@@ -110,7 +129,7 @@ const Chatbot = () => {
       setMessages((prev) => 
         prev.filter((msg) => msg.id !== typingId).concat({
           id: Date.now(),
-          text: "Sorry, something went wrong. Please try again later.",
+          text: "Sorry, something went wrong. Please try again later. If error persists, contact me at mushtaquok70@gmail.com",
           side: "left",
           time: getTime(),
         }));

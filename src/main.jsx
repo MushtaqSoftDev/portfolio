@@ -1,5 +1,11 @@
-if (typeof navigator !== "undefined") {
-  navigator.gpu = undefined;
+
+// Prevent navigator.gpu getter error
+if (typeof navigator !== 'undefined' && 'gpu' in navigator) {
+  try {
+    delete navigator.gpu
+  } catch (err) {
+    console.warn('navigator.gpu deletion skipped:', err)
+  }
 }
 
 import { StrictMode } from 'react'
