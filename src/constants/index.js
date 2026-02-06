@@ -210,7 +210,7 @@ export const workExperiences = [
   {
     id: 1,
     name: 'KNITERATE S.L.',
-    pos: 'Frontend Developer',
+    pos: 'Full Stack Developer (Frontend Focus)',
     duration: '2025 - Present',
     title: "At Kniterate, I am responsible for developing and maintaining knitting software. Work closely with designers to implement new features based on their specific requirements, translating visual concepts into technical funcionality. Dedicated to imporve the codebase and optimizing performance to ensure smooth workflow for digital knitting production.",
     icon: '/assets/kniterate.png',
