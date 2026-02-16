@@ -17,6 +17,7 @@ type Message = {
 };
 
 const STACK_RESPONSES: Record<string, string> = {
+  // Predefined responses for quick tech‑stack exploration
   "Full-Stack development":
     "🧩 Full-Stack Development\n\n• React, Next.js\n• Node.js, Express\n• MongoDB, PostgreSQL\n• REST APIs\n\n📩 mushtaquok70@gmail.com",
 
@@ -29,8 +30,6 @@ const STACK_RESPONSES: Record<string, string> = {
   "AI/ML development":
     "🤖 AI / ML Development\n\n• OpenAI APIs\n• LangChain\n• RAG ChatBot\n• PyTorch DL Models\n• Vector DB concepts\n\n📩 mushtaquok70@gmail.com",
 };
-
-const RESPONSE_DELAY = 10000;
 
 const getTime = () => 
   new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit"});
@@ -67,7 +66,7 @@ const Chatbot = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Handle RAG Integration
+  // Handle RAG Integration (Render web service)
   const handleSendMessage = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (!inputValue.trim() || isAiLoading) return;
@@ -86,12 +85,7 @@ const Chatbot = () => {
     setIsAiLoading(true);
 
     try {
-      // 2. Call backend Cloudflare Pages
-      /*const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question: userText }),
-      });*/
+      // 2. Call RAG backend hosted on Render
       const wakeUpMessageId = Date.now() + 2;
       const wakeUpTimer = setTimeout(() => {
         setMessages(prev => [...prev, {
@@ -101,7 +95,6 @@ const Chatbot = () => {
         time: getTime()
       }]);
     }, 5000); // Show after 5 seconds of waiting
-      // Replace your old Cloudflare URL with your Render URL
       const response = await fetch("https://rag-portfolio-bot.onrender.com/chat", {
        method: "POST",
        headers: { "Content-Type": "application/json" },
