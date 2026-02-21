@@ -34,6 +34,12 @@ const STACK_RESPONSES: Record<string, string> = {
 const getTime = () => 
   new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit"});
 
+const WELCOME_MESSAGES = [
+  "How can I help you today?",
+  "Welcome to Mushtaq's portfolio! 👋",
+  "Ask me anything about my work!",
+  "Let's explore together! 🚀",
+];
 
 const Chatbot = () => {
   const [open, setOpen] = useState(false);
@@ -41,17 +47,18 @@ const Chatbot = () => {
   const [inputValue, setInputValue] = useState("");
   const [isAiLoading, setIsAiLoading] = useState(false);
   const bottomRef = useRef<HTMLDivElement | null>(null);
-
+  const [welcomeMessage] = useState(() => 
+    WELCOME_MESSAGES[Math.floor(Math.random() * WELCOME_MESSAGES.length)]
+  );
 
   // Auto-scroll
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth"});
   }, [messages]);
 
-  // ⏱ Auto open after delay
+  // Initialize welcome message when chatbot opens
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setOpen(true);
+    if (open && messages.length === 0) {
       setMessages([
         {
           id: 1,
@@ -61,10 +68,8 @@ const Chatbot = () => {
           time: getTime(),
         },
       ]);
-    }, 1500);
-
-    return () => clearTimeout(timer);
-  }, []);
+    }
+  }, [open]);
 
   // Handle RAG Integration (Render web service)
   const handleSendMessage = async (e?: React.FormEvent) => {
@@ -170,117 +175,153 @@ const Chatbot = () => {
     setToast("Email copied");
   };
 
+  const handleClose = () => {
+    setOpen(false);
+    // Optionally reset messages when closing
+    // setMessages([]);
+  };
+
   return (
     <>
-      {/* Floating Icon */}
-      <button
-        onClick={() => setOpen((p) => !p)}
-        className="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-black text-white shadow-lg"
-        aria-label="Open chat"
-      >
-        💬
-      </button>
-
-      {/* Chat Window */}
-      {open && (
-        <div className="fixed bottom-24 right-6 z-50 w-[90vw] sm:w-[360px] max-h-[500px]
-                        bg-[#0d0d0d] rounded-2xl shadow-xl flex flex-col overflow-hidden">
-          
-          {/* Header */}
-          <div className="px-4 py-3 text-white font-medium border-b border-white/10">
-            Portfolio Assistent
+      {/* Floating Chat Button - Shows welcome message when closed */}
+      {!open ? (
+        <button
+          onClick={() => setOpen(true)}
+          className="chatbot-fab group"
+          aria-label="Open chat"
+        >
+          <div className="relative">
+            <div className="chatbot-fab-icon">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="28"
+                height="28"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+              </svg>
+            </div>
+            <div className="chatbot-welcome-bubble">
+              {welcomeMessage}
+              <div className="chatbot-welcome-bubble-arrow"></div>
+            </div>
+          </div>
+        </button>
+      ) : (
+        <div className="chatbot-window">
+          <div className="chatbot-header">
+            <div className="flex items-center gap-2">
+              <div className="chatbot-header-status"></div>
+              <span className="chatbot-header-title">Portfolio Assistant</span>
+            </div>
+            <button
+              onClick={handleClose}
+              className="chatbot-close-btn"
+              aria-label="Close chat"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
           </div>
 
-          {/* Messages */}
-          <div className="flex-1 p-4 space-y-3 overflow-y-auto">
-            {messages.map((msg) => (
-              <div
-                key={msg.id}
-                className={`flex ${msg.side === "right" ? "justify-end" : "justify-start"}`}
-              >
-                <div
-                  className={`max-w-[85%] whitespace-pre-line text-sm px-4 py-2 rounded-xl
-                    ${msg.side === "right"
-                      ? "bg-blue-600 text-white rounded-br-none"
-                      : "bg-gray-800 text-white rounded-bl-none"}`}
-                >
-                  {/* Typing Indicator */}
-                  {msg.typing ? (
-                    <div className="flex gap-1 items-center">
-                      <span className="typing-dot" />
-                      <span className="typing-dot" />
-                      <span className="typing-dot" />
-                    </div>
-                  ) : (
-                    <>
-                      <div className="whitespace-pre-line">
-                        {msg.text?.split("\n").map((line, i) => {
-                          if (line.includes("@")) {
-                          return (
-                            <div
-                              key={i}
-                                onClick={handleEmailClick}
-                                className="mt-2 flex items-center gap-2 cursor-pointer
-                                text-blue-400 hover:text-blue-300 transition"
-                            >
-                              📩 <span className="underline">{line.replace("📩", "").trim()}</span>
-                            </div>
-                          );
-                        }
-
-                          return <div key={i}>{line}</div>;
-                        })}
-                      </div>
-
-
-                      {msg.buttons && (
-                        <div className="mt-3 space-y-2">
-                          {msg.buttons.map((btn) => (
-                            <button
-                              key={btn}
-                              onClick={() => handleOptionClick(btn)}
-                              className="block w-full text-left px-3 py-2 rounded-lg
-                                         bg-black hover:bg-gray-700 transition"
-                            >
-                              {btn}
-                               </button>
-                          ))}
-                        </div>
-                      )}
-                      {msg.time && (
-                        <div className="text-[10px] text-white/50 text-right mt-1">
-                          {msg.time}
-                        </div>
-                      )}
-                    </>
-                  )}
+          <div className="chatbot-messages">
+            {messages.length === 0 ? (
+              <div className="chatbot-messages-empty">
+                <div className="chatbot-messages-empty-inner">
+                  <div className="mb-2">💬</div>
+                  <div>{welcomeMessage}</div>
                 </div>
               </div>
-            ))}
-            <div ref={bottomRef}/>
+            ) : (
+              messages.map((msg) => (
+                <div
+                  key={msg.id}
+                  className={`chatbot-msg-row ${msg.side === "right" ? "chatbot-msg-row--right" : "chatbot-msg-row--left"}`}
+                >
+                  <div
+                    className={`chatbot-msg-bubble ${msg.side === "right" ? "chatbot-msg-bubble--right" : "chatbot-msg-bubble--left"}`}
+                  >
+                    {msg.typing ? (
+                      <div className="chatbot-msg-typing">
+                        <span className="typing-dot" />
+                        <span className="typing-dot" />
+                        <span className="typing-dot" />
+                      </div>
+                    ) : (
+                      <>
+                        <div className="whitespace-pre-line">
+                          {msg.text?.split("\n").map((line, i) => {
+                            if (line.includes("@")) {
+                              return (
+                                <div
+                                  key={i}
+                                  onClick={handleEmailClick}
+                                  className="chatbot-email-link"
+                                >
+                                  📩 <span className="underline">{line.replace("📩", "").trim()}</span>
+                                </div>
+                              );
+                            }
+                            return <div key={i}>{line}</div>;
+                          })}
+                        </div>
+                        {msg.buttons && (
+                          <div className="chatbot-options">
+                            {msg.buttons.map((btn) => (
+                              <button
+                                key={btn}
+                                onClick={() => handleOptionClick(btn)}
+                                className="chatbot-option-btn"
+                              >
+                                {btn}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                        {msg.time && (
+                          <div className="chatbot-msg-time">
+                            {msg.time}
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </div>
+                </div>
+              ))
+            )}
+            <div ref={bottomRef} />
           </div>
 
-          {/* Input Form */}
-          <form 
-            onSubmit={handleSendMessage}
-            className="p-3 bg-[#1a1a1a] border-t border-white/10 flex items-center gap-2"
-          >
+          <form onSubmit={handleSendMessage} className="chatbot-form">
             <input
               type="text"
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               placeholder="Type your message..."
-              className="flex-1 bg-black/50 text-white text-sm rounded-xl px-4 py-2 border border-white/5 focus:outline-none focus:border-blue-500 transition"
+              className="chatbot-input"
               disabled={isAiLoading}
             />
             <button
               type="submit"
               disabled={isAiLoading || !inputValue.trim()}
-              className={`p-2 rounded-xl transition ${
-                !inputValue.trim() || isAiLoading 
-                ? "text-gray-600 bg-transparent" 
-                : "text-white bg-blue-600 hover:bg-blue-500"
-              }`}
+              className={`chatbot-send-btn ${!inputValue.trim() || isAiLoading ? "chatbot-send-btn--disabled" : "chatbot-send-btn--active"}`}
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="22" y1="2" x2="11" y2="13"></line>
@@ -290,34 +331,6 @@ const Chatbot = () => {
           </form>
         </div>
       )}
-
-      {/* Typing animation styles */}
-      <style>
-        {`
-          .typing-dot {
-            width: 6px;
-            height: 6px;
-            background: white;
-            border-radius: 50%;
-            animation: blink 1.4s infinite both;
-          }
-
-          .typing-dot:nth-child(2) {
-            animation-delay: 0.2s;
-          }
-
-          .typing-dot:nth-child(3) {
-            animation-delay: 0.4s;
-          }
-
-          @keyframes blink {
-            0% { opacity: 0.2; }
-            20% { opacity: 1; }
-            100% { opacity: 0.2; }
-          }
-        `}
-      </style>
-
     </>
   );
 };

@@ -25,3 +25,6 @@ dist-ssr
 
 # env
 .env
+
+# ONNX Runtime WASM is loaded from CDN; avoid committing local copies
+public/wasm/
