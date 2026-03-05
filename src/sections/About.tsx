@@ -38,9 +38,9 @@ const About = () => {
 
             <div>
               <p className="grid-headtext">Hi, I'm Mushtaq Ahmad</p>
-              <p className='grid-headtext'>Web Application Developer</p>
+              <p className='grid-headtext'>AI Software Engineer</p>
               <p className="grid-subtext">
-                With 4 years of experience, I develop dynamic, data-driven web apps using modern frontend & backend technologies for seamless performance.
+              With 4 years of experience, I build intelligent, data-driven web applications using modern frontend and backend technologies. I focus on developing scalable AI systems, integrating LLMs and RAG pipelines, and delivering reliable end-to-end solutions for real-world applications.
               </p>
             </div>
           </div>

@@ -81,6 +81,43 @@ export const navLinks: NavLink[] = [
 
 export const myProjects: Project[] = [
   {
+    title: 'LLMForge - GenAI Optimization Studio',
+    desc: 'LLMForge is a GenAI optimization studio for experimenting with multiple LLM providers and prompt engineering. It lets developers compare models, tune parameters, and run chat and fine-tuning workflows through a single full-stack application.',
+    subdesc:
+      'Built with FastAPI, Vue.js and PostgreSQL, it supports OpenAI, DeepSeek, Groq, Gemini and local Hugging Face. Offers chat interface, parameter tuning, fine-tuning workflows and multi-language i18n for seamless team collaboration.',
+    href: 'https://github.com/MushtaqSoftDev/LLMForge-GenAI-Optimization-Studio',
+    texture: '/textures/project/llm.mp4',
+    logo: '/assets/project-logo5.png',
+    logoStyle: {
+      backgroundColor: '#1C1A43',
+      border: '0.2px solid #252262',
+      boxShadow: '0px 0px 60px 0px #635BFF4D',
+    },
+    spotlight: '/assets/spotlight5.png',
+    tags: [
+      {
+        id: 1,
+        name: 'Vue.js',
+        path: '/assets/vue.png',
+      },
+      {
+        id: 2,
+        name: 'Python',
+        path: '/assets/python.jpeg',
+      },
+      {
+        id: 3,
+        name: 'FastAPI',
+        path: '/assets/flask.jpeg',
+      },
+      {
+        id: 4,
+        name: 'Hugging Face',
+        path: '/assets/huggingface.png',
+      },
+    ],
+  },
+  {
     title: 'Event Management System Using NextJS',
     desc: 'EMS is a full stack event management web application built with NextJS and MongoDB. It allows users to create, manage, and attend events seamlessly through an intuitive interface.',
     subdesc:
