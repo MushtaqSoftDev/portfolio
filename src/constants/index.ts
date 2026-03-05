@@ -117,6 +117,11 @@ export const myProjects: Project[] = [
         name: 'Hugging Face',
         path: '/assets/huggingface.png',
       },
+      {
+        id: 5,
+        name: 'PostgreSQL',
+        path: '/assets/postgre.png',
+      },
     ],
   },
   {
