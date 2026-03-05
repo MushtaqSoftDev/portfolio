@@ -169,10 +169,43 @@ const Chatbot = () => {
     }, 8000);
   };
 
-  const handleEmailClick = () => {
-    navigator.clipboard.writeText("mushtaquok70@gmail.com");
+  const handleEmailClick = (email?: string) => {
+    navigator.clipboard.writeText(email ?? "mushtaquok70@gmail.com");
     toast.dismiss();
     setToast("Email copied");
+  };
+
+  // Renders a line with only email addresses as clickable links; rest stays plain for copy.
+  const renderLineWithEmailLinks = (line: string, lineKey: number) => {
+    const emailRegex = /[\w.-]+@[\w.-]+\.\w+/g;
+    const parts: (string | JSX.Element)[] = [];
+    let lastIndex = 0;
+    let match;
+    let key = 0;
+    const re = new RegExp(emailRegex.source, "g");
+    while ((match = re.exec(line)) !== null) {
+      if (match.index > lastIndex) {
+        parts.push(line.slice(lastIndex, match.index));
+      }
+      const email = match[0];
+      parts.push(
+        <span
+          key={`${lineKey}-${key++}`}
+          role="button"
+          tabIndex={0}
+          onClick={() => handleEmailClick(email)}
+          onKeyDown={(e) => e.key === "Enter" && handleEmailClick(email)}
+          className="chatbot-email-link cursor-pointer underline"
+        >
+          {email}
+        </span>
+      );
+      lastIndex = re.lastIndex;
+    }
+    if (lastIndex < line.length) {
+      parts.push(line.slice(lastIndex));
+    }
+    return parts.length > 0 ? parts : [line];
   };
 
   const handleClose = () => {
@@ -267,20 +300,11 @@ const Chatbot = () => {
                     ) : (
                       <>
                         <div className="whitespace-pre-line">
-                          {msg.text?.split("\n").map((line, i) => {
-                            if (line.includes("@")) {
-                              return (
-                                <div
-                                  key={i}
-                                  onClick={handleEmailClick}
-                                  className="chatbot-email-link"
-                                >
-                                  📩 <span className="underline">{line.replace("📩", "").trim()}</span>
-                                </div>
-                              );
-                            }
-                            return <div key={i}>{line}</div>;
-                          })}
+                          {msg.text?.split("\n").map((line, i) => (
+                            <div key={i}>
+                              {renderLineWithEmailLinks(line, i)}
+                            </div>
+                          ))}
                         </div>
                         {msg.buttons && (
                           <div className="chatbot-options">

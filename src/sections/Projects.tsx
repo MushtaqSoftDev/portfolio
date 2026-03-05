@@ -47,7 +47,7 @@ const Projects = () => {
             <p className="animatedText">{currentProject.subdesc}</p>
           </div>
 
-          <div className="flex items-center justify-between flex-wrap gap-5">
+            <div className="flex items-center justify-between flex-wrap gap-5">
             <div className="flex items-center gap-3">
               {currentProject.tags.map((tag, index) => (
                 <div key={index} className="tech-logo">
@@ -56,14 +56,26 @@ const Projects = () => {
               ))}
             </div>
 
-            <a
-              className="flex items-center gap-2 cursor-pointer text-white-600"
-              href={currentProject.href}
-              target="_blank"
-              rel="noreferrer">
-              <p>Source Code</p>
-              <img src="/assets/arrow-up.png" alt="arrow" className="w-3 h-3" />
-            </a>
+            <div className="flex items-center gap-4">
+              {currentProject.demoHref && (
+                <a
+                  className="flex items-center gap-2 cursor-pointer text-white-600"
+                  href={currentProject.demoHref}
+                  target="_blank"
+                  rel="noreferrer">
+                  <p>Live Demo</p>
+                  <img src="/assets/arrow-up.png" alt="arrow" className="w-3 h-3" />
+                </a>
+              )}
+              <a
+                className="flex items-center gap-2 cursor-pointer text-white-600"
+                href={currentProject.href}
+                target="_blank"
+                rel="noreferrer">
+                <p>Source Code</p>
+                <img src="/assets/arrow-up.png" alt="arrow" className="w-3 h-3" />
+              </a>
+            </div>
           </div>
 
           <div className="flex justify-between items-center mt-7">

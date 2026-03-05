@@ -15,6 +15,7 @@ export interface Project {
   desc: string;
   subdesc: string;
   href: string;
+  demoHref?: string;
   texture: string;
   logo: string;
   logoStyle: {
@@ -86,6 +87,7 @@ export const myProjects: Project[] = [
     subdesc:
       'Built with FastAPI, Vue.js and PostgreSQL, it supports OpenAI, DeepSeek, Groq, Gemini and local Hugging Face. Offers chat interface, parameter tuning, fine-tuning workflows and multi-language i18n for seamless team collaboration.',
     href: 'https://github.com/MushtaqSoftDev/LLMForge-GenAI-Optimization-Studio',
+    demoHref: 'https://llmforge-genai-optimization-studio.onrender.com',
     texture: '/textures/project/llm.mp4',
     logo: '/assets/project-logo5.png',
     logoStyle: {
