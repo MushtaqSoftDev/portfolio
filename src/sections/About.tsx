@@ -93,12 +93,25 @@ const About = () => {
 
         <div className="xl:col-span-2 xl:row-span-3">
           <div className="grid-container">
-            <img src="assets/grid3.png" alt="grid-3" className="w-full sm:h-[266px] h-fit object-contain" />
+            <div className="cert-badges">
+              <div className="cert-badge cert-badge--oci" title="OCI AI Foundation">
+                <span className="cert-badge__icon">OCI</span>
+                <span className="cert-badge__label">AI Foundation</span>
+              </div>
+              <div className="cert-badge cert-badge--oci" title="OCI Gen AI Professional">
+                <span className="cert-badge__icon">OCI</span>
+                <span className="cert-badge__label">Gen AI Pro</span>
+              </div>
+              <div className="cert-badge cert-badge--aws" title="AWS Serverless">
+                <span className="cert-badge__icon">AWS</span>
+                <span className="cert-badge__label">Serverless</span>
+              </div>
+            </div>
 
             <div>
               <p className="grid-headtext">Certification</p>
               <p className="grid-subtext">
-                Passionate about coding and problem-solving, continuously explore new technologies. I've recently achieved (ORACLE Cloud Infrastructure) OCI AI Foundation & OCI GEN AI Professional certifications to level up my skills.
+                Passionate about coding and problem-solving, continuously exploring new technologies. I&apos;ve achieved (Oracle Cloud Infrastructure) OCI AI Foundation, OCI Gen AI Professional, and AWS Serverless certifications to level up my skills.
               </p>
             </div>
           </div>
@@ -106,16 +119,20 @@ const About = () => {
 
         <div className="xl:col-span-1 xl:row-span-2">
           <div className="grid-container">
-            <img
-              src="assets/grid4.png"
-              alt="grid-4"
-              className="w-full md:h-[126px] sm:h-[276px] h-fit object-cover sm:object-top"
-            />
+            <div className="contact-hero-icon" aria-hidden>
+              <span className="contact-hero-icon__envelope" />
+            </div>
 
             <div className="space-y-2">
               <p className="grid-subtext text-center">Contact me</p>
               <div className="copy-container" onClick={handleCopy}>
-                <img src={hasCopied ? 'assets/tick.svg' : 'assets/copy.svg'} alt="copy" />
+                <div className={`copy-icon ${hasCopied ? 'copy-icon--tick' : 'copy-icon--email'}`} aria-hidden>
+                  {hasCopied ? (
+                    <span className="copy-icon__tick" />
+                  ) : (
+                    <span className="copy-icon__email" />
+                  )}
+                </div>
                 <p className="lg:text-2xl md:text-xl font-medium text-gray_gradient text-white">mushtaquok70@gmail.com</p>
               </div>
             </div>
