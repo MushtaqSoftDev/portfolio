@@ -106,12 +106,16 @@ const About = () => {
                 <span className="cert-badge__icon">AWS</span>
                 <span className="cert-badge__label">Serverless</span>
               </div>
+              <div className="cert-badge cert-badge--aws" title="AWS Cloud Practitioner Essentials">
+                <span className="cert-badge__icon">AWS</span>
+                <span className="cert-badge__label">Cloud Practitioner</span>
+              </div>
             </div>
 
             <div>
               <p className="grid-headtext">Certification</p>
               <p className="grid-subtext">
-                Passionate about coding and problem-solving, continuously exploring new technologies. I&apos;ve achieved (Oracle Cloud Infrastructure) OCI AI Foundation, OCI Gen AI Professional, and AWS Serverless certifications to level up my skills.
+                Passionate about coding and problem-solving, continuously exploring new technologies. I&apos;ve achieved (Oracle Cloud Infrastructure) OCI AI Foundation, OCI Gen AI Professional, AWS Serverless, and AWS Cloud Practitioner Essentials certifications to level up my skills.
               </p>
             </div>
           </div>

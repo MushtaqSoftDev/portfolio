@@ -122,6 +122,54 @@ export const myProjects: Project[] = [
         name: 'PostgreSQL',
         path: '/assets/postgre.png',
       },
+      {
+        id: 6,
+        name: 'Docker',
+        path: '/assets/docker.png',
+      },
+    ],
+  },
+  {
+    title: 'ContextEng-Rag-experiment-lab',
+    desc: 'ContextEng-Rag-experiment-lab is an LLM experiment lab for document-grounded Q&A, where users can upload files and control output quality in real time through context-engineering parameters.',
+    subdesc:
+      'Built with React, FastAPI, ChromaDB and sentence-transformers, it provides a full RAG pipeline with live controls for chunk size, top-K retrieval, temperature, top-p and reasoning modes, plus streaming responses for rapid experimentation.',
+    href: 'https://github.com/MushtaqSoftDev/ContextEng-Rag-experiment-lab',
+    demoHref: 'https://contexteng-rag-experiment-lab.onrender.com',
+    texture: '/textures/project/contextEngRag.mp4',
+    logo: '/assets/project-logo5.png',
+    logoStyle: {
+      backgroundColor: '#1C1A43',
+      border: '0.2px solid #252262',
+      boxShadow: '0px 0px 60px 0px #635BFF4D',
+    },
+    spotlight: '/assets/spotlight5.png',
+    tags: [
+      {
+        id: 1,
+        name: 'React.js',
+        path: '/assets/react.svg',
+      },
+      {
+        id: 2,
+        name: 'Python',
+        path: '/assets/python.jpeg',
+      },
+      {
+        id: 3,
+        name: 'FastAPI',
+        path: '/assets/flask.jpeg',
+      },
+      {
+        id: 4,
+        name: 'ChromaDB',
+        path: '/assets/huggingface.png',
+      },
+      {
+        id: 5,
+        name: 'Docker',
+        path: '/assets/docker.png',
+      },
     ],
   },
   {
