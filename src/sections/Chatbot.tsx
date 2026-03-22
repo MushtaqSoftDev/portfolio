@@ -1,6 +1,16 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useMemo, useCallback } from "react";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+
+/** Web Speech API (Chrome/Edge best; Safari partial) */
+function getSpeechRecognitionCtor(): (new () => SpeechRecognition) | null {
+  if (typeof window === "undefined") return null;
+  const w = window as Window &
+    typeof globalThis & {
+      webkitSpeechRecognition?: new () => SpeechRecognition;
+    };
+  return w.SpeechRecognition ?? w.webkitSpeechRecognition ?? null;
+}
 
 
 const setToast = (message: string) => {
@@ -54,10 +64,90 @@ const Chatbot = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [isAiLoading, setIsAiLoading] = useState(false);
+  const [voiceListening, setVoiceListening] = useState(false);
   const bottomRef = useRef<HTMLDivElement | null>(null);
+  const recognitionRef = useRef<SpeechRecognition | null>(null);
   const [welcomeMessage] = useState(() => 
     WELCOME_MESSAGES[Math.floor(Math.random() * WELCOME_MESSAGES.length)]
   );
+
+  const speechSupported = useMemo(() => !!getSpeechRecognitionCtor(), []);
+
+  const stopVoice = useCallback(() => {
+    try {
+      recognitionRef.current?.stop();
+    } catch {
+      /* already stopped */
+    }
+    recognitionRef.current = null;
+    setVoiceListening(false);
+  }, []);
+
+  const toggleVoiceInput = useCallback(() => {
+    if (!speechSupported) {
+      toast.info("Voice input works best in Chrome or Edge on desktop.", {
+        autoClose: 4000,
+      });
+      return;
+    }
+    if (isAiLoading) return;
+
+    if (voiceListening) {
+      stopVoice();
+      return;
+    }
+
+    const Ctor = getSpeechRecognitionCtor();
+    if (!Ctor) return;
+
+    const rec = new Ctor();
+    rec.lang = navigator.language || "en-US";
+    rec.interimResults = true;
+    rec.continuous = false;
+
+    rec.onresult = (event: SpeechRecognitionEvent) => {
+      let line = "";
+      for (let i = 0; i < event.results.length; i++) {
+        line += event.results[i][0].transcript;
+      }
+      setInputValue(line.trimStart());
+    };
+
+    rec.onerror = (ev: SpeechRecognitionErrorEvent) => {
+      setVoiceListening(false);
+      recognitionRef.current = null;
+      if (ev.error === "not-allowed") {
+        toast.error("Microphone permission denied.");
+      } else if (ev.error !== "aborted" && ev.error !== "no-speech") {
+        toast.error("Voice input failed. Try again or type your message.");
+      }
+    };
+
+    rec.onend = () => {
+      setVoiceListening(false);
+      recognitionRef.current = null;
+    };
+
+    recognitionRef.current = rec;
+    setVoiceListening(true);
+    try {
+      rec.start();
+    } catch {
+      setVoiceListening(false);
+      recognitionRef.current = null;
+      toast.error("Could not start microphone.");
+    }
+  }, [isAiLoading, speechSupported, stopVoice, voiceListening]);
+
+  useEffect(() => {
+    return () => {
+      try {
+        recognitionRef.current?.stop();
+      } catch {
+        /* ignore */
+      }
+    };
+  }, []);
 
   // Auto-scroll
   useEffect(() => {
@@ -458,14 +548,51 @@ const Chatbot = () => {
               type="text"
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
-              placeholder="Type your message..."
+              placeholder={
+                speechSupported
+                  ? "Type a message or tap the mic…"
+                  : "Type your message…"
+              }
               className="chatbot-input"
-              disabled={isAiLoading}
+              disabled={isAiLoading || voiceListening}
             />
             <button
+              type="button"
+              onClick={toggleVoiceInput}
+              disabled={isAiLoading || !speechSupported}
+              className={`chatbot-voice-btn ${voiceListening ? "chatbot-voice-btn--listening" : ""} ${!speechSupported || isAiLoading ? "chatbot-voice-btn--disabled" : "chatbot-voice-btn--idle"}`}
+              aria-label={voiceListening ? "Stop listening" : "Speak your message"}
+              aria-pressed={voiceListening}
+              title={
+                speechSupported
+                  ? voiceListening
+                    ? "Stop"
+                    : "Speak (fills the box; edit if needed, then send)"
+                  : "Voice not available in this browser"
+              }
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden
+              >
+                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                <line x1="12" y1="19" x2="12" y2="23" />
+                <line x1="8" y1="23" x2="16" y2="23" />
+              </svg>
+            </button>
+            <button
               type="submit"
-              disabled={isAiLoading || !inputValue.trim()}
-              className={`chatbot-send-btn ${!inputValue.trim() || isAiLoading ? "chatbot-send-btn--disabled" : "chatbot-send-btn--active"}`}
+              disabled={isAiLoading || !inputValue.trim() || voiceListening}
+              className={`chatbot-send-btn ${!inputValue.trim() || isAiLoading || voiceListening ? "chatbot-send-btn--disabled" : "chatbot-send-btn--active"}`}
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="22" y1="2" x2="11" y2="13"></line>
