@@ -648,6 +648,10 @@ body {
   @apply flex gap-1 items-center;
 }
 
+.chatbot-stream-status {
+  @apply text-xs text-white/70 italic mb-2 border-b border-white/10 pb-2;
+}
+
 .chatbot-email-link {
   @apply mt-2 flex items-center gap-2 cursor-pointer text-blue-400 hover:text-blue-300 transition;
 }

@@ -10,6 +10,8 @@ const setToast = (message: string) => {
 type Message = {
   id: number;
   text?: string;
+  /** Transient line while the assistant works (tools / thinking); hidden once answer streams */
+  loadingStatus?: string;
   side: "left" | "right";
   buttons?: string[];
   typing?: boolean;
@@ -41,6 +43,12 @@ const WELCOME_MESSAGES = [
   "Let's explore together! 🚀",
 ];
 
+/** RAG backend base URL (no trailing slash). Override in `.env`: `VITE_RAG_API_ORIGIN=https://...` */
+const RAG_API_ORIGIN = (
+  (import.meta.env.VITE_RAG_API_ORIGIN as string | undefined) ||
+  "https://rag-portfolio-bot.onrender.com"
+).replace(/\/$/, "");
+
 const Chatbot = () => {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -71,67 +79,164 @@ const Chatbot = () => {
     }
   }, [open]);
 
-  // Handle RAG Integration (Render web service)
+  // Handle RAG Integration (streaming SSE)
   const handleSendMessage = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (!inputValue.trim() || isAiLoading) return;
 
-    const userText = inputValue;
-    const typingId = Date.now() + 1;
+    const userText = inputValue.trim();
+    const userMsgId = Date.now();
+    const assistantMsgId = userMsgId + 1;
+    const wakeUpMessageId = userMsgId + 2;
 
-    // 1. Add user message and typing indicator
     setMessages((prev) => [
       ...prev,
-      { id: Date.now(), text: userText, side: "right", time: getTime() },
-      { id: typingId, side: "left", typing: true, time: getTime() },
+      { id: userMsgId, text: userText, side: "right", time: getTime() },
+      {
+        id: assistantMsgId,
+        text: "",
+        side: "left",
+        time: getTime(),
+      },
     ]);
 
     setInputValue("");
     setIsAiLoading(true);
 
+    let wakeUpTimer: ReturnType<typeof setTimeout> | null = null;
+
+    const clearWake = () => {
+      if (wakeUpTimer !== null) {
+        clearTimeout(wakeUpTimer);
+        wakeUpTimer = null;
+      }
+      setMessages((prev) => prev.filter((m) => m.id !== wakeUpMessageId));
+    };
+
+    wakeUpTimer = setTimeout(() => {
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: wakeUpMessageId,
+          text: "☕ The server is waking up (this takes ~1 min on the free tier). Please wait...",
+          side: "left",
+          time: getTime(),
+        },
+      ]);
+    }, 5000);
+
+    const setAssistantError = () => {
+      setMessages((prev) =>
+        prev.map((m) =>
+          m.id === assistantMsgId
+            ? {
+                ...m,
+                text: "Sorry, something went wrong. Please try again later. If error persists, contact me at mushtaquok70@gmail.com",
+              }
+            : m
+        )
+      );
+    };
+
     try {
-      // 2. Call RAG backend hosted on Render
-      const wakeUpMessageId = Date.now() + 2;
-      const wakeUpTimer = setTimeout(() => {
-        setMessages(prev => [...prev, {
-        id: wakeUpMessageId,
-        text: "☕ The server is waking up (this takes ~1 min on the free tier). Please wait...",
-        side: "left",
-        time: getTime()
-      }]);
-    }, 5000); // Show after 5 seconds of waiting
-      const response = await fetch("https://rag-portfolio-bot.onrender.com/chat", {
-       method: "POST",
-       headers: { "Content-Type": "application/json" },
-       body: JSON.stringify({ question: userText }),
+      const response = await fetch(`${RAG_API_ORIGIN}/chat/stream`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "text/event-stream",
+        },
+        body: JSON.stringify({ question: userText }),
       });
 
-      // After fetch is done
-      clearTimeout(wakeUpTimer);
-      setMessages(prev => prev.filter(m => m.id !== wakeUpMessageId));
+      if (!response.ok) {
+        clearWake();
+        setAssistantError();
+        throw new Error("Error from server");
+      }
 
-      if (!response.ok) throw new Error("Error from server");
+      const reader = response.body?.getReader();
+      if (!reader) {
+        clearWake();
+        setAssistantError();
+        throw new Error("No response body");
+      }
 
-      const data = await response.json();
+      const decoder = new TextDecoder();
+      let sseBuffer = "";
 
-      // 3. Remove typing indicator and add AI response
-      setMessages((prev) => 
-        prev.filter((msg) => msg.id !== typingId)
-        .concat({
-          id: Date.now(),
-          text: data.answer || "Hmm, I don't have an answer for that yet.",
-          side: "left",
-          time: getTime(),
-        }));
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        sseBuffer += decoder.decode(value, { stream: true });
+
+        const blocks = sseBuffer.split("\n\n");
+        sseBuffer = blocks.pop() ?? "";
+
+        for (const block of blocks) {
+          for (const line of block.split("\n")) {
+            if (!line.startsWith("data:")) continue;
+            const raw = line.replace(/^data:\s?/, "").trim();
+            if (raw === "[DONE]") continue;
+
+            let parsed: { text?: string; status?: string; error?: string };
+            try {
+              parsed = JSON.parse(raw) as {
+                text?: string;
+                status?: string;
+                error?: string;
+              };
+            } catch {
+              continue;
+            }
+
+            if (parsed.error) {
+              clearWake();
+              setAssistantError();
+              console.error("Chatbot stream error:", parsed.error);
+              return;
+            }
+
+            if (Object.prototype.hasOwnProperty.call(parsed, "status")) {
+              clearWake();
+              const s = parsed.status;
+              setMessages((prev) =>
+                prev.map((m) =>
+                  m.id === assistantMsgId
+                    ? {
+                        ...m,
+                        loadingStatus: s ? s : undefined,
+                      }
+                    : m
+                )
+              );
+            }
+
+            if (parsed.text) {
+              clearWake();
+              setMessages((prev) =>
+                prev.map((m) =>
+                  m.id === assistantMsgId
+                    ? { ...m, text: (m.text ?? "") + parsed.text }
+                    : m
+                )
+              );
+            }
+          }
+        }
+      }
+
+      clearWake();
+      setMessages((prev) =>
+        prev.map((m) =>
+          m.id === assistantMsgId && !(m.text ?? "").trim()
+            ? { ...m, text: "Hmm, I don't have an answer for that yet." }
+            : m
+        )
+      );
     } catch (error) {
-      setMessages((prev) => 
-        prev.filter((msg) => msg.id !== typingId).concat({
-          id: Date.now(),
-          text: "Sorry, something went wrong. Please try again later. If error persists, contact me at mushtaquok70@gmail.com",
-          side: "left",
-          time: getTime(),
-        }));
-        console.error("Chatbot error:", error);
+      clearWake();
+      setAssistantError();
+      console.error("Chatbot error:", error);
     } finally {
       setIsAiLoading(false);
     }
@@ -297,10 +402,25 @@ const Chatbot = () => {
                         <span className="typing-dot" />
                         <span className="typing-dot" />
                       </div>
+                    ) : msg.side === "left" &&
+                      isAiLoading &&
+                      !msg.text?.trim() &&
+                      !msg.buttons &&
+                      !msg.loadingStatus ? (
+                      <div className="chatbot-msg-typing">
+                        <span className="typing-dot" />
+                        <span className="typing-dot" />
+                        <span className="typing-dot" />
+                      </div>
                     ) : (
                       <>
+                        {msg.loadingStatus ? (
+                          <div className="chatbot-stream-status">
+                            {msg.loadingStatus}
+                          </div>
+                        ) : null}
                         <div className="whitespace-pre-line">
-                          {msg.text?.split("\n").map((line, i) => (
+                          {(msg.text ?? "").split("\n").map((line, i) => (
                             <div key={i}>
                               {renderLineWithEmailLinks(line, i)}
                             </div>
