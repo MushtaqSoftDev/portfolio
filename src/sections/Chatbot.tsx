@@ -1,13 +1,37 @@
-import { useEffect, useState, useRef, useMemo, useCallback } from "react";
+import React, { useEffect, useState, useRef, useMemo, useCallback } from "react";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+type SpeechRecognitionResultLike = {
+  0: { transcript: string };
+};
+
+type SpeechRecognitionEventLike = {
+  results: SpeechRecognitionResultLike[];
+};
+
+type SpeechRecognitionErrorEventLike = {
+  error: string;
+};
+
+type SpeechRecognitionLike = {
+  lang: string;
+  interimResults: boolean;
+  continuous: boolean;
+  onresult: ((event: SpeechRecognitionEventLike) => void) | null;
+  onerror: ((event: SpeechRecognitionErrorEventLike) => void) | null;
+  onend: (() => void) | null;
+  start: () => void;
+  stop: () => void;
+};
+
 /** Web Speech API (Chrome/Edge best; Safari partial) */
-function getSpeechRecognitionCtor(): (new () => SpeechRecognition) | null {
+function getSpeechRecognitionCtor(): (new () => SpeechRecognitionLike) | null {
   if (typeof window === "undefined") return null;
   const w = window as Window &
     typeof globalThis & {
-      webkitSpeechRecognition?: new () => SpeechRecognition;
+      SpeechRecognition?: new () => SpeechRecognitionLike;
+      webkitSpeechRecognition?: new () => SpeechRecognitionLike;
     };
   return w.SpeechRecognition ?? w.webkitSpeechRecognition ?? null;
 }
@@ -22,6 +46,7 @@ type Message = {
   text?: string;
   /** Transient line while the assistant works (tools / thinking); hidden once answer streams */
   loadingStatus?: string;
+  transient?: boolean;
   side: "left" | "right";
   buttons?: string[];
   typing?: boolean;
@@ -59,6 +84,8 @@ const RAG_API_ORIGIN = (
   "https://rag-portfolio-bot.onrender.com"
 ).replace(/\/$/, "");
 
+const CHAT_HISTORY_KEY = "portfolio_chat_history_v1";
+
 const Chatbot = () => {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -66,7 +93,7 @@ const Chatbot = () => {
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [voiceListening, setVoiceListening] = useState(false);
   const bottomRef = useRef<HTMLDivElement | null>(null);
-  const recognitionRef = useRef<SpeechRecognition | null>(null);
+  const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
   const [welcomeMessage] = useState(() => 
     WELCOME_MESSAGES[Math.floor(Math.random() * WELCOME_MESSAGES.length)]
   );
@@ -105,7 +132,7 @@ const Chatbot = () => {
     rec.interimResults = true;
     rec.continuous = false;
 
-    rec.onresult = (event: SpeechRecognitionEvent) => {
+    rec.onresult = (event: SpeechRecognitionEventLike) => {
       let line = "";
       for (let i = 0; i < event.results.length; i++) {
         line += event.results[i][0].transcript;
@@ -113,7 +140,7 @@ const Chatbot = () => {
       setInputValue(line.trimStart());
     };
 
-    rec.onerror = (ev: SpeechRecognitionErrorEvent) => {
+    rec.onerror = (ev: SpeechRecognitionErrorEventLike) => {
       setVoiceListening(false);
       recognitionRef.current = null;
       if (ev.error === "not-allowed") {
@@ -169,6 +196,35 @@ const Chatbot = () => {
     }
   }, [open]);
 
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(CHAT_HISTORY_KEY);
+      if (!saved) return;
+      const parsed = JSON.parse(saved) as Message[];
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        setMessages(parsed);
+      }
+    } catch {
+      /* ignore malformed local history */
+    }
+  }, []);
+
+  useEffect(() => {
+    const persistable = messages.filter(
+      (m) =>
+        !m.typing &&
+        !m.buttons &&
+        !m.loadingStatus &&
+        !m.transient &&
+        !!m.text?.trim()
+    );
+    try {
+      localStorage.setItem(CHAT_HISTORY_KEY, JSON.stringify(persistable.slice(-40)));
+    } catch {
+      /* ignore storage quota issues */
+    }
+  }, [messages]);
+
   // Handle RAG Integration (streaming SSE)
   const handleSendMessage = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -210,6 +266,7 @@ const Chatbot = () => {
           id: wakeUpMessageId,
           text: "☕ The server is waking up (this takes ~1 min on the free tier). Please wait...",
           side: "left",
+          transient: true,
           time: getTime(),
         },
       ]);
@@ -268,7 +325,11 @@ const Chatbot = () => {
             const raw = line.replace(/^data:\s?/, "").trim();
             if (raw === "[DONE]") continue;
 
-            let parsed: { text?: string; status?: string; error?: string };
+            let parsed: {
+              text?: string;
+              status?: string;
+              error?: string;
+            };
             try {
               parsed = JSON.parse(raw) as {
                 text?: string;
@@ -311,6 +372,7 @@ const Chatbot = () => {
                 )
               );
             }
+
           }
         }
       }
@@ -409,6 +471,20 @@ const Chatbot = () => {
     // setMessages([]);
   };
 
+  const clearHistory = () => {
+    localStorage.removeItem(CHAT_HISTORY_KEY);
+    setMessages([
+      {
+        id: 1,
+        text: "Hi 👋 Welcome to my portfolio. \nWhat would you like to explore today?\n👇",
+        side: "left",
+        buttons: Object.keys(STACK_RESPONSES),
+        time: getTime(),
+      },
+    ]);
+    toast.info("Chat history cleared.");
+  };
+
   return (
     <>
       {/* Floating Chat Button - Shows welcome message when closed */}
@@ -447,26 +523,36 @@ const Chatbot = () => {
               <div className="chatbot-header-status"></div>
               <span className="chatbot-header-title">Portfolio Assistant</span>
             </div>
-            <button
-              onClick={handleClose}
-              className="chatbot-close-btn"
-              aria-label="Close chat"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
+            <div className="flex items-center gap-2">
+              <button
+                onClick={clearHistory}
+                className="chatbot-clear-btn"
+                aria-label="Clear chat history"
+                title="Clear chat history"
               >
-                <line x1="18" y1="6" x2="6" y2="18"></line>
-                <line x1="6" y1="6" x2="18" y2="18"></line>
-              </svg>
-            </button>
+                Clear
+              </button>
+              <button
+                onClick={handleClose}
+                className="chatbot-close-btn"
+                aria-label="Close chat"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
           </div>
 
           <div className="chatbot-messages">

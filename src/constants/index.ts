@@ -82,6 +82,49 @@ export const navLinks: NavLink[] = [
 
 export const myProjects: Project[] = [
   {
+    title: 'ContextEng-Rag-experiment-lab',
+    desc: 'ContextEng-Rag-experiment-lab is an LLM experiment lab for document-grounded Q&A, where users can upload files and control output quality in real time through context-engineering parameters.',
+    subdesc:
+      'Built with React, FastAPI, ChromaDB and sentence-transformers, it provides a full RAG pipeline with live controls for chunk size, top-K retrieval, temperature, top-p and reasoning modes, plus streaming responses for rapid experimentation.',
+    href: 'https://github.com/MushtaqSoftDev/ContextEng-Rag-experiment-lab',
+    demoHref: 'https://contexteng-rag-experiment-lab.onrender.com',
+    texture: '/textures/project/contextEngRag.mp4',
+    logo: '/assets/project-logo5.png',
+    logoStyle: {
+      backgroundColor: '#1C1A43',
+      border: '0.2px solid #252262',
+      boxShadow: '0px 0px 60px 0px #635BFF4D',
+    },
+    spotlight: '/assets/spotlight5.png',
+    tags: [
+      {
+        id: 1,
+        name: 'React.js',
+        path: '/assets/react.svg',
+      },
+      {
+        id: 2,
+        name: 'Python',
+        path: '/assets/python.jpeg',
+      },
+      {
+        id: 3,
+        name: 'FastAPI',
+        path: '/assets/flask.jpeg',
+      },
+      {
+        id: 4,
+        name: 'ChromaDB',
+        path: '/assets/huggingface.png',
+      },
+      {
+        id: 5,
+        name: 'Docker',
+        path: '/assets/docker.png',
+      },
+    ],
+  },
+  {
     title: 'LLMForge - GenAI Optimization Studio',
     desc: 'LLMForge is a GenAI optimization studio for experimenting with multiple LLM providers and prompt engineering. It lets developers compare models, tune parameters, and run chat and fine-tuning workflows through a single full-stack application.',
     subdesc:
@@ -124,49 +167,6 @@ export const myProjects: Project[] = [
       },
       {
         id: 6,
-        name: 'Docker',
-        path: '/assets/docker.png',
-      },
-    ],
-  },
-  {
-    title: 'ContextEng-Rag-experiment-lab',
-    desc: 'ContextEng-Rag-experiment-lab is an LLM experiment lab for document-grounded Q&A, where users can upload files and control output quality in real time through context-engineering parameters.',
-    subdesc:
-      'Built with React, FastAPI, ChromaDB and sentence-transformers, it provides a full RAG pipeline with live controls for chunk size, top-K retrieval, temperature, top-p and reasoning modes, plus streaming responses for rapid experimentation.',
-    href: 'https://github.com/MushtaqSoftDev/ContextEng-Rag-experiment-lab',
-    demoHref: 'https://contexteng-rag-experiment-lab.onrender.com',
-    texture: '/textures/project/contextEngRag.mp4',
-    logo: '/assets/project-logo5.png',
-    logoStyle: {
-      backgroundColor: '#1C1A43',
-      border: '0.2px solid #252262',
-      boxShadow: '0px 0px 60px 0px #635BFF4D',
-    },
-    spotlight: '/assets/spotlight5.png',
-    tags: [
-      {
-        id: 1,
-        name: 'React.js',
-        path: '/assets/react.svg',
-      },
-      {
-        id: 2,
-        name: 'Python',
-        path: '/assets/python.jpeg',
-      },
-      {
-        id: 3,
-        name: 'FastAPI',
-        path: '/assets/flask.jpeg',
-      },
-      {
-        id: 4,
-        name: 'ChromaDB',
-        path: '/assets/huggingface.png',
-      },
-      {
-        id: 5,
         name: 'Docker',
         path: '/assets/docker.png',
       },
@@ -358,38 +358,48 @@ export const calculateSizes = (isSmall: boolean, isMobile: boolean, isTablet: bo
 export const workExperiences: WorkExperience[] = [
   {
     id: 1,
+    name: 'GMP Pattyn Film Division',
+    pos: 'Applied AI Engineer',
+    duration: 'April 2026 - Present',
+    title:
+      'At GMP Pattyn Film Division, I built intelligent automation systems—using Python, FastAPI, and React—that transform manual business processes into scalable, AI-driven workflows. Expert in containerizing solutions with Docker and deploying via CI/CD pipelines to MicrosoftAzure',
+    icon: '/assets/GMP.jpeg',
+    animation: 'victory',
+  },
+  {
+    id: 2,
     name: 'KNITERATE S.L.',
     pos: 'Web Developer (Frontend Focus)',
     duration: '2025 - Feb 2026',
     title: "At Kniterate, I work as a Web Developer for developing and maintaining knitting software. Work closely with designers to implement new features based on their specific requirements, translating visual concepts into technical funcionality. Dedicated to imporve the codebase and optimizing performance to ensure smooth workflow for digital knitting production.",
     icon: '/assets/kniterate.png',
-    animation: 'victory',
+    animation: 'salute',
   },
   {
-    id: 2,
+    id: 3,
     name: 'Freelance',
     pos: 'Web Developer',
     duration: '2023 - 2024',
     title: "As a Freelance Web Developer, built a dynamic ROI calculator web app using MERN Stack that instantly generates year-wise profit & agency commission breakdowns, enable clients to visualize investment returns in real-time. Developed a real-time AI chatbot app using Node/Express/MongoDB with Socket.io integration and OpenAI API. ",
     icon: '/assets/freelance.jpeg',
-    animation: 'salute',
+    animation: 'clapping',
   },
   {
-    id: 3,
+    id: 4,
     name: 'Mega Star',
     pos: 'IT Technician',
     duration: '2019 - 2024',
     title: "During my tenure at Mega Star, I was responsible for maintaining and troubleshooting IT systems. My duties included hardware and software support, and providing technical assistance to client, which honed my problem-solving skills and technical expertise.",
     icon: '/assets/megastar.jpeg',
-    animation: 'clapping',
+    animation: 'salute',
   },
   {
-    id: 4,
+    id: 5,
     name: 'Global Coaching Center',
     pos: 'Mathematics Tutor',
     duration: '2014 - 2018',
     title: "As a Mathematics Tutor at Global Coaching Center, I provided personalized instruction to students, helping them grasp complex mathematical concepts and improve their academic performance. My approach focused on fostering a supportive learning environment that encouraged critical thinking and problem-solving skills.",
     icon: '/assets/global.png',
-    animation: 'salute',
+    animation: 'clapping',
   },
 ];

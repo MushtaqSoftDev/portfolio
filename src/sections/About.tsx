@@ -38,9 +38,9 @@ const About = () => {
 
             <div>
               <p className="grid-headtext">Hi, I'm Mushtaq Ahmad</p>
-              <p className='grid-headtext'>AI Software Engineer</p>
+              <p className='grid-headtext'>Applied AI Engineer</p>
               <p className="grid-subtext">
-              With 4 years of experience, I build intelligent, data-driven web applications using modern frontend and backend technologies. I focus on developing scalable AI systems, integrating LLMs and RAG pipelines, and delivering reliable end-to-end solutions for real-world applications.
+              With 4 years of experience, I build intelligent, data-driven applications by bridging the gap between AI models and production software. I focus on architecting end-to-end automation, integrating LLMs and RAG pipelines, and deploying scalable, containerized solutions on Azure to solve complex real-world business challenges.
               </p>
             </div>
           </div>
@@ -53,7 +53,7 @@ const About = () => {
             <div>
               <p className="grid-headtext">Tech Stack</p>
               <p className="grid-subtext">
-                Specialized in MERN stack & also work with Vue.js, PHP, Laravel, Python, Flask, PyTorch, Java, Spring/Spring Boot and CMS platform like Wordpress to build scalable and user-friendly apps.
+                Specialized in Python (FastAPI), React, and Docker for AI-driven systems. Proficient in the MERN stack, Java (Spring Boot), and PHP (Laravel), with additional experience in PyTorch and Vue.js. I combine modern AI tools with deep full-stack expertise to build, containerize, and deploy scalable enterprise apps.
               </p>
             </div>
           </div>
