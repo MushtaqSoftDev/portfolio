@@ -94,13 +94,17 @@ const About = () => {
         <div className="xl:col-span-2 xl:row-span-3">
           <div className="grid-container">
             <div className="cert-badges">
+              <div className="cert-badge cert-badge--oci" title="AGENTIC AI Foundation">
+                <span className="cert-badge__icon">OCI</span>
+                <span className="cert-badge__label">AGENTIC AI Foundation</span>
+              </div>
               <div className="cert-badge cert-badge--oci" title="OCI AI Foundation">
                 <span className="cert-badge__icon">OCI</span>
                 <span className="cert-badge__label">AI Foundation</span>
               </div>
               <div className="cert-badge cert-badge--oci" title="OCI Gen AI Professional">
                 <span className="cert-badge__icon">OCI</span>
-                <span className="cert-badge__label">Gen AI Pro</span>
+                <span className="cert-badge__label">Gen AI Prof</span>
               </div>
               <div className="cert-badge cert-badge--aws" title="AWS Serverless">
                 <span className="cert-badge__icon">AWS</span>
