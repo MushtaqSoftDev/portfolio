@@ -104,7 +104,7 @@ const About = () => {
               </div>
               <div className="cert-badge cert-badge--oci" title="OCI Gen AI Professional">
                 <span className="cert-badge__icon">OCI</span>
-                <span className="cert-badge__label">Gen AI Prof</span>
+                <span className="cert-badge__label">Gen AI Professional</span>
               </div>
               <div className="cert-badge cert-badge--aws" title="AWS Serverless">
                 <span className="cert-badge__icon">AWS</span>
